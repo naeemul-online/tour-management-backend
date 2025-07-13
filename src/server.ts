@@ -1,11 +1,10 @@
 import { Server } from "http";
-import express, { Request, Response } from "express";
 import mongoose from "mongoose";
-import { envVars } from "./config/env";
+import { envVars } from "./app/config/env";
+import { app } from "./app";
 
 let server: Server;
 
-const app = express();
 
 const startServer = async () => {
   try {
@@ -24,11 +23,7 @@ const startServer = async () => {
 
 startServer();
 
-app.get("/", (req: Request, res: Response) => {
-  res.status(200).json({
-    message: "Welcome to tour management app",
-  });
-});
+
 
 // unhandled rejection error
 process.on("unhandledRejection", (err) => {
