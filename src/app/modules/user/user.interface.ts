@@ -7,7 +7,7 @@ export enum Role {
   SUPER_ADMIN = "SUPER_ADMIN",
 }
 export interface IAuthProviders {
-  provider: string;
+  provider: "google" | "credentials";
   providerId: string;
 }
 
@@ -18,6 +18,7 @@ export enum IsActive {
 }
 
 export interface IUser {
+  _id?: string;
   name: string;
   email: string;
   password?: string;
@@ -27,10 +28,8 @@ export interface IUser {
   address?: string;
   isDeleted?: boolean;
   isActive?: IsActive;
-  isVerified?: string;
+  isVerified?: boolean;
   auth: IAuthProviders[];
   booking?: Types.ObjectId[];
   guide?: Types.ObjectId[];
 }
-
-
