@@ -41,7 +41,7 @@ passport.use(
             picture: profile.photos?.[0].value,
             role: Role.USER,
             isVerified: true,
-            auths: [
+            auth: [
               {
                 provider: "google",
                 providerId: profile.id,
@@ -78,7 +78,7 @@ passport.use(
           (providerObject) => providerObject.provider == "google"
         );
 
-        if (isGoogleAuthenticate) {
+        if (isGoogleAuthenticate && !isUserExists.password) {
           return done(
             "You have authenticated through Google, so if you want to login with credentials, then at first login with google and set a password for your Gmail and then you can login with email and password."
           );
