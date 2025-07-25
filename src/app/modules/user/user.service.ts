@@ -5,6 +5,8 @@ import { envVars } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { IAuthProviders, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
+import { QueryBuilder } from "../../utils/QueryBuilder";
+import { userSearchableFields } from "./user.constant";
 
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password, ...rest } = payload;
@@ -37,15 +39,35 @@ const createUser = async (payload: Partial<IUser>) => {
   return user;
 };
 
-const getAllUsers = async () => {
-  const users = await User.find({});
-  const totalUsers = await User.countDocuments();
-  return {
-    data: users,
-    meta: {
-      total: totalUsers,
-    },
-  };
+const getAllUsers = async (query: Record<string, string>) => {
+   const queryBuilder = new QueryBuilder(User.find(), query);
+  
+    const users = await queryBuilder
+      .search(userSearchableFields)
+      .filter()
+      .sort()
+      .fields()
+      .paginate();
+  
+    const [data, meta] = await Promise.all([
+      users.build(),
+      queryBuilder.getMeta(),
+    ]);
+  
+    return { data, meta };
+  // const users = await User.find({});
+  // const totalUsers = await User.countDocuments();
+  // return {
+  //   data: users,
+  //   meta: {
+  //     total: totalUsers,
+  //   },
+  // };
+};
+
+const getSingleUser = async (id: string) => {
+  const user = await User.findById(id);
+  return user;
 };
 
 // update user
@@ -65,9 +87,9 @@ const updateUser = async (
   payload: Partial<IUser>,
   decodedToken: JwtPayload
 ) => {
-  const ifUserExist = await User.findById(userId);
+  const isUserExist = await User.findById(userId);
 
-  if (!ifUserExist) {
+  if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
   }
 
@@ -114,5 +136,6 @@ const updateUser = async (
 export const UserServices = {
   createUser,
   getAllUsers,
+  getSingleUser,
   updateUser,
 };
